@@ -83,7 +83,7 @@ function render() {
        <form>
     <h2>${question.title}</h2>
       <ol type = "A">
-    <li><input type = "radio" name = "answers" value = "0"/>
+    <li><input type = "radio" name = "answers" value = "0" autofocus = "on" required/>
     <label>${question.answers[0]}</label></li>
     <li><input type = "radio" name = "answers" value = "1"/>
     <label>${question.answers[1]}</label></li>
@@ -106,7 +106,7 @@ function render() {
     
     <h4>Current Score: ${STORE.score}</h4>
     <button id = "next">Next Question</button>
-</section>
+  </section>
     `);
   } else if (STORE.page == "feedback-final") {
     // Renders the feedback page for the final question, which leads the user to the results page
@@ -121,10 +121,12 @@ function render() {
   } else if (STORE.page == "results") {
     // Renders the results page.
     $("main").html(`
+    <section>
     <h2>Congratulations, you completed the quiz! Your final score is ${STORE.score}/${STORE.questions.length}.</h2>
     <br/>
     <h2>Would you like to try again?</h2>
     <button id = "restart">Start Over</button>
+    </section>
     `);
   }
 }
@@ -144,7 +146,8 @@ function eventListeners() {
     if (userAnswer == question.correct) {
       // This checks if the user-given answer is correct
       STORE.score++; // Adds one point to the user's score
-      STORE.feedback = "That's correct! Good Job."; // Correct Answer Message
+      STORE.feedback =
+        question.answers[question.correct] + " is correct! Good Job."; // Correct Answer Message
     } else {
       // If the user answers incorrectly, this feedback message displays instead
       STORE.feedback =
@@ -171,8 +174,7 @@ function eventListeners() {
       // If there are no more questions, renders the results page
       STORE.page = "results";
       render();
-    } else 
-    STORE.page = "question";
+    } else STORE.page = "question";
     render();
   });
 
