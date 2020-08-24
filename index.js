@@ -63,111 +63,138 @@ const STORE = {
   ],
 };
 
-function render() {
-  // Render Function
-  const question = STORE.questions[STORE.questionNumber]; // This defines the current quiz question
-  if (STORE.page == "landing") {
-    // Renders the Splash Page
-    $("main").html(`
+function renderLanding() {
+  // Landing Page Render
+  return `
 <section>
     <h2>Test your gaming knowledge! See how many questions you can answer.</h2>
     <button id = "start">Start Quiz</button>
 </section>
-`);
-  } else if (STORE.page == "question") {
-    // Renders the current question in the quiz
-    $("main").html(`
-    <section>
-    <h3>Question ${STORE.questionNumber + 1}/${STORE.questions.length}</h3>
+`;
+}
 
-       <form>
-    <h2>${question.title}</h2>
-      <ol type = "A">
-    <li><input type = "radio" name = "answers" value = "0" autofocus = "on" required/>
-    <label>${question.answers[0]}</label></li>
-    <li><input type = "radio" name = "answers" value = "1"/>
-    <label>${question.answers[1]}</label></li>
-    <li><input type = "radio" name = "answers" value = "2"/>
-    <label>${question.answers[2]}</label></li>
-    <li><input type = "radio" name = "answers" value = "3"/>
-    <label>${question.answers[3]}</label></li>
-    </ol>
-    <button id = "submit">Submit</button>
-    </form>
+function renderQuestion() {
+  // Question Page Render
+  const question = STORE.questions[STORE.questionNumber]; // This defines the current quiz question
+  return `
+  <section>
+  <h3>Question ${STORE.questionNumber + 1}/${STORE.questions.length}</h3>
 
-    <h4>Current Score: ${STORE.score}</h4>
+     <form>
+
+  <h2>${question.title}</h2>
+
+    <ol type = "A">
+  <li><input type = "radio" name = "answers" value = "0" autofocus = "on" required/>
+  <label>${question.answers[0]}</label></li>
+  <li><input type = "radio" name = "answers" value = "1"/>
+  <label>${question.answers[1]}</label></li>
+  <li><input type = "radio" name = "answers" value = "2"/>
+  <label>${question.answers[2]}</label></li>
+  <li><input type = "radio" name = "answers" value = "3"/>
+  <label>${question.answers[3]}</label></li>
+  </ol>
+  <button id = "submit">Submit</button>
+  </form>
+
+  <h4>Current Score: ${STORE.score}</h4>
 </section>
-    `);
-  } else if (STORE.page == "feedback") {
-    // Renders the feedback page for the first four questions
-    $("main").html(`
+  `;
+}
+
+function renderFeedback() {
+  return `
     <section>
     <h3>${STORE.feedback}</h3>
     
     <h4>Current Score: ${STORE.score}</h4>
     <button id = "next">Next Question</button>
   </section>
-    `);
-  } else if (STORE.page == "feedback-final") {
-    // Renders the feedback page for the final question, which leads the user to the results page
-    $("main").html(`
-    <section>
-    <h3>${STORE.feedback}</h3>
+    `;
+}
 
-    <h4>Current Score: ${STORE.score}</h4>
-    <button id = "next">See Results</button>
+function renderFeedbackFinal() {
+  return `
+  <section>
+  <h3>${STORE.feedback}</h3>
+
+  <h4>Current Score: ${STORE.score}</h4>
+  <button id = "next">See Results</button>
 </section>
-    `);
-  } else if (STORE.page == "results") {
-    // Renders the results page.
-    $("main").html(`
+  `;
+}
+
+function renderResults() {
+  return `
     <section>
     <h2>Congratulations, you completed the quiz! Your final score is ${STORE.score}/${STORE.questions.length}.</h2>
     <br/>
     <h2>Would you like to try again?</h2>
     <button id = "restart">Start Over</button>
     </section>
-    `);
+    `;
+}
+
+
+function render() {
+  // All-Purpose Render Function
+  let html = "";
+  if (STORE.page == "landing") {
+    html = renderLanding();
+    // Renders the Splash Page
+  } else if (STORE.page == "question") {
+    html = renderQuestion();
+    // Renders the current question in the quiz
+  } else if (STORE.page == "feedback") {
+    // Renders the feedback page for the first four questions
+    html = renderFeedback();
+  } else if (STORE.page == "feedback-final") {
+    // Renders the feedback page for the final question, which leads the user to the results page
+    html = renderFeedbackFinal();
+  } else if (STORE.page == "results") {
+    // Renders the results page.
+    html= renderResults();
+  }
+  $("main").html(html);
+}
+
+function startPageEvent(e) {
+  // Start Page
+  STORE.page = "question";
+  render();
+}
+
+function submitAnswerEvent(e) {
+  // This listens for when the user submits an answer and defines what feedback message they get
+  e.preventDefault();
+  const userAnswer = e.target.answers.value; // This defines the answer the user gave
+  const question = STORE.questions[STORE.questionNumber]; // This defines the current question being asked in the quiz
+  if (userAnswer == question.correct) {
+    // This checks if the user-given answer is correct
+    STORE.score++; // Adds one point to the user's score
+    STORE.feedback =
+      question.answers[question.correct] + " is correct! Good Job."; // Correct Answer Message
+  } else {
+    // If the user answers incorrectly, this feedback message displays instead
+    STORE.feedback =
+      "Sorry, that's incorrect. The correct answer is " +
+      question.answers[question.correct] +
+      "."; // Incorrect Answer Message, which also provides the correct answer
+  }
+  STORE.questionNumber++;
+  if (STORE.questionNumber == STORE.questions.length) {
+    // If this is the last question, we render the "feedback-final" page
+    STORE.page = "feedback-final";
+
+    render();
+  } else if (STORE.questionNumber < STORE.questions.length) {
+    STORE.page = "feedback";
+
+    render();
   }
 }
 
-function eventListeners() {
-  // Event Listener Functions
-  $("body").on("click", "#start", (e) => {
-    // Start Page
-    STORE.page = "question";
-    render();
-  });
-  $("body").on("submit", "form", (e) => {
-    // This listens for when the user submits an answer and defines what feedback message they get
-    e.preventDefault();
-    const userAnswer = e.target.answers.value; // This defines the answer the user gave
-    const question = STORE.questions[STORE.questionNumber]; // This defines the current question being asked in the quiz
-    if (userAnswer == question.correct) {
-      // This checks if the user-given answer is correct
-      STORE.score++; // Adds one point to the user's score
-      STORE.feedback =
-        question.answers[question.correct] + " is correct! Good Job."; // Correct Answer Message
-    } else {
-      // If the user answers incorrectly, this feedback message displays instead
-      STORE.feedback =
-        "Sorry, that's incorrect. The correct answer is " +
-        question.answers[question.correct] +
-        "."; // Incorrect Answer Message, which also provides the correct answer
-    }
-    STORE.questionNumber++;
-    if (STORE.questionNumber == STORE.questions.length) {
-      // If this is the last question, we render the "feedback-final" page
-      STORE.page = "feedback-final";
-
-      render();
-    } else if (STORE.questionNumber < STORE.questions.length) {
-      STORE.page = "feedback";
-
-      render();
-    }
-  });
-  $("body").on("click", "#next", (e) => {
+function nextQuestionEvent(e) {
     // This takes the user to the next question in the quiz
     e.preventDefault();
     if (STORE.questionNumber == STORE.questions.length) {
@@ -176,16 +203,22 @@ function eventListeners() {
       render();
     } else STORE.page = "question";
     render();
-  });
+}
 
-  $("body").on("click", "#restart", (e) => {
+function restartEvent(e) {
     // Resets all values and restarts the quiz
     e.preventDefault();
     STORE.page = "landing";
     STORE.score = 0;
     STORE.questionNumber = 0;
     render();
-  });
+}
+function eventListeners() {
+  // Event Listener Functions
+  $("body").on("click", "#start", startPageEvent);
+  $("body").on("submit", "form", submitAnswerEvent);
+  $("body").on("click", "#next", nextQuestionEvent);
+  $("body").on("click", "#restart", restartEvent);
 }
 
 function main() {
