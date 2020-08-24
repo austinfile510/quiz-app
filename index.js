@@ -95,6 +95,7 @@ function renderQuestion() {
   <label>${question.answers[3]}</label></li>
   </ol>
   <button id = "submit">Submit</button>
+  
   </form>
 
   <h4>Current Score: ${STORE.score}</h4>
@@ -103,6 +104,7 @@ function renderQuestion() {
 }
 
 function renderFeedback() {
+  // Feedback HTML
   return `
     <section>
     <h3>${STORE.feedback}</h3>
@@ -114,6 +116,7 @@ function renderFeedback() {
 }
 
 function renderFeedbackFinal() {
+  // Final Feedback HTML
   return `
   <section>
   <h3>${STORE.feedback}</h3>
@@ -125,6 +128,7 @@ function renderFeedbackFinal() {
 }
 
 function renderResults() {
+  // Results HTML
   return `
     <section>
     <h2>Congratulations, you completed the quiz! Your final score is ${STORE.score}/${STORE.questions.length}.</h2>
@@ -134,7 +138,6 @@ function renderResults() {
     </section>
     `;
 }
-
 
 function render() {
   // All-Purpose Render Function
@@ -153,7 +156,7 @@ function render() {
     html = renderFeedbackFinal();
   } else if (STORE.page == "results") {
     // Renders the results page.
-    html= renderResults();
+    html = renderResults();
   }
   $("main").html(html);
 }
@@ -195,23 +198,23 @@ function submitAnswerEvent(e) {
 }
 
 function nextQuestionEvent(e) {
-    // This takes the user to the next question in the quiz
-    e.preventDefault();
-    if (STORE.questionNumber == STORE.questions.length) {
-      // If there are no more questions, renders the results page
-      STORE.page = "results";
-      render();
-    } else STORE.page = "question";
+  // This takes the user to the next question in the quiz
+  e.preventDefault();
+  if (STORE.questionNumber == STORE.questions.length) {
+    // If there are no more questions, renders the results page
+    STORE.page = "results";
     render();
+  } else STORE.page = "question";
+  render();
 }
 
 function restartEvent(e) {
-    // Resets all values and restarts the quiz
-    e.preventDefault();
-    STORE.page = "landing";
-    STORE.score = 0;
-    STORE.questionNumber = 0;
-    render();
+  // Resets all values and restarts the quiz
+  e.preventDefault();
+  STORE.page = "landing";
+  STORE.score = 0;
+  STORE.questionNumber = 0;
+  render();
 }
 function eventListeners() {
   // Event Listener Functions
